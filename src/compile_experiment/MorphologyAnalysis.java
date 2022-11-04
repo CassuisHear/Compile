@@ -1,10 +1,11 @@
 package compile_experiment;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashSet;
 
 public class MorphologyAnalysis {
 
+    //保留字集合
     private static final HashSet<String> keyWords;
 
     static {
@@ -35,7 +36,15 @@ public class MorphologyAnalysis {
         keyWords.add("static");
         keyWords.add("final");
         keyWords.add("class");
+        keyWords.add("System");
+        keyWords.add("out");
+        keyWords.add("in");
+        keyWords.add("println");
+        keyWords.add("print");
     }
+
+    //用来存储输出结果
+    private static final StringBuilder ans = new StringBuilder();
 
     //判断是否位操作符
     private static boolean isOperator(char ch) {
@@ -45,7 +54,7 @@ public class MorphologyAnalysis {
 
     //判断是否为界符
     private static boolean isBoundChar(char ch) {
-        return ch == ',' || ch == '.' || ch == ';' || ch == '(' || ch == ')';
+        return ch == ',' || ch == '.' || ch == ';' || ch == '(' || ch == ')' || ch == '{' || ch == '}' || ch == '"' || ch == ':';
     }
 
     //对操作符集合进行判断并输出
@@ -53,57 +62,81 @@ public class MorphologyAnalysis {
         for (int i = 0; i < s.length(); i++) {
             switch (s.charAt(i)) {
                 case '+': {
-                    System.out.println("(加号,'+')");
+                    i++;
+                    if (i < s.length() && s.charAt(i) == '=') {
+                        ans.append("(加等于号,'+=')").append('\n');
+                    } else if (i < s.length() && s.charAt(i) == '+') {
+                        ans.append("(自增符号,'++')").append('\n');
+                    } else {
+                        i--;
+                        ans.append("(加号,'+')").append('\n');
+                    }
                     break;
                 }
                 case '-': {
-                    System.out.println("(减号,'-')");
+                    i++;
+                    if (i < s.length() && s.charAt(i) == '=') {
+                        ans.append("(减等于号,'-=')").append('\n');
+                    } else if (i < s.length() && s.charAt(i) == '-') {
+                        ans.append("(自减符号,'--')").append('\n');
+                    } else {
+                        i--;
+                        ans.append("(减号,'-')").append('\n');
+                    }
                     break;
                 }
                 case '*': {
-                    System.out.println("(乘号,'*')");
+                    i++;
+                    if (i < s.length() && s.charAt(i) == '=') {
+                        ans.append("(乘等于号,'*=')").append('\n');
+                    } else {
+                        i--;
+                        ans.append("(乘号,'*')").append('\n');
+                    }
                     break;
                 }
                 case '/': {
-                    System.out.println("(除号,'/')");
+                    i++;
+                    if (i < s.length() && s.charAt(i) == '=') {
+                        ans.append("(除等于号,'/=')").append('\n');
+                    } else {
+                        i--;
+                        ans.append("(除号,'/')").append('\n');
+                    }
                     break;
                 }
                 case '=': {
-                    System.out.println("(等于号,'=')");
-                    break;
-                }
-                case ':': {
                     i++;
                     if (i < s.length() && s.charAt(i) == '=') {
-                        System.out.println("(赋值号,':=')");
+                        ans.append("(等于号,'==')").append('\n');
                     } else {
                         i--;
-                        System.out.println("(非法字符,':')");
+                        ans.append("(赋值符号,'=')").append('\n');
                     }
                     break;
                 }
                 case '<': {
                     i++;
                     if (i < s.length() && s.charAt(i) == '=') {
-                        System.out.println("(小于等于号,'<=')");
+                        ans.append("(小于等于号,'<=')").append('\n');
                     } else {
                         i--;
-                        System.out.println("(小于号,'<')");
+                        ans.append("(小于号,'<')").append('\n');
                     }
                     break;
                 }
                 case '>': {
                     i++;
                     if (i < s.length() && s.charAt(i) == '=') {
-                        System.out.println("(大于等于号,'>=')");
+                        ans.append("(大于等于号,'>=')").append('\n');
                     } else {
                         i--;
-                        System.out.println("(大于号,'>')");
+                        ans.append("(大于号,'>')").append('\n');
                     }
                     break;
                 }
                 default: {
-                    System.out.println("(非法字符,'" + s.charAt(i) + "')");
+                    ans.append("(非法字符,'").append(s.charAt(i)).append("')").append('\n');
                     break;
                 }
             }
@@ -115,27 +148,44 @@ public class MorphologyAnalysis {
         for (char ch : s.toCharArray()) {
             switch (ch) {
                 case '(': {
-                    System.out.println("(左括号,'(')");
+                    ans.append("(左括号,'(')").append('\n');
+                    System.out.println();
                     break;
                 }
                 case ')': {
-                    System.out.println("(右括号,')')");
+                    ans.append("(右括号,')')").append('\n');
                     break;
                 }
                 case ',': {
-                    System.out.println("(逗号,',')");
+                    ans.append("(逗号,',')").append('\n');
                     break;
                 }
                 case ';': {
-                    System.out.println("(分号,';')");
+                    ans.append("(分号,';')").append('\n');
                     break;
                 }
                 case '.': {
-                    System.out.println("(点,'.')");
+                    ans.append("(点,'.')").append('\n');
+                    break;
+                }
+                case '{': {
+                    ans.append("(左大括号,'{')").append('\n');
+                    break;
+                }
+                case '}': {
+                    ans.append("(右大括号,'}')").append('\n');
+                    break;
+                }
+                case '"': {
+                    ans.append("(双引号,'\"')").append('\n');
+                    break;
+                }
+                case ':': {
+                    ans.append("(冒号,':')").append('\n');
                     break;
                 }
                 default: {
-                    System.out.println("(非法字符,'" + ch + "')");
+                    ans.append("(非法字符,'").append(ch).append("')").append('\n');
                     break;
                 }
             }
@@ -144,13 +194,17 @@ public class MorphologyAnalysis {
 
     //输入函数
     private static String inputStr() throws IOException {
-        System.out.println("请键入一个字符串(字符'#'代表输入结束):");
         StringBuilder str = new StringBuilder();
-        char ch = (char) System.in.read();
+        BufferedReader br;
+        br = new BufferedReader(new FileReader("src\\input.txt"));
+        char ch = (char) br.read();
         while (ch != '#') {
-            str.append(ch);
-            ch = (char) System.in.read();
+            if (ch != '\n' && ch != '\r') {
+                str.append(ch);
+            }
+            ch = (char) br.read();
         }
+        br.close();
         str.append('#');
         return str.toString();
     }
@@ -193,16 +247,16 @@ public class MorphologyAnalysis {
                     String innerString = innerStr.toString();
                     //1.1是保留字
                     if (keyWords.contains(innerString)) {
-                        System.out.println("(保留字,'" + innerString + "')");
+                        ans.append("(保留字,'").append(innerString).append("')").append('\n');
                     } else {//1.2非保留字，即标识符
-                        System.out.println("(标识符,'" + innerString + "')");
+                        ans.append("(标识符,'").append(innerString).append("')").append('\n');
                     }
                 } else if (Character.isDigit(tempStr.charAt(j))) {//2.段内字符串的首字符为数字
                     //后续仍为数字字符时继续追加
                     while (j < length && Character.isDigit(tempStr.charAt(j))) {
                         innerStr.append(tempStr.charAt(j++));
                     }
-                    System.out.println("(数字,'" + innerStr.toString() + "')");
+                    ans.append("(数字,'").append(innerStr).append("')").append('\n');
                 } else if (isOperator(tempStr.charAt(j))) {//3.段内字符串的首字符为操作符
                     //后续仍为操作符字符时继续追加
                     while (j < length && isOperator(tempStr.charAt(j))) {
@@ -220,7 +274,7 @@ public class MorphologyAnalysis {
                     //处理界符
                     processBoundChar(innerStr.toString());
                 } else {//5.其他情况，输入错误
-                    System.out.println("(非法输入,'" + tempStr.charAt(j) + "')");
+                    ans.append("(非法输入,'").append(tempStr.charAt(j)).append("')").append('\n');
                     j++;
                 }
                 //重置段内字符串
@@ -229,13 +283,17 @@ public class MorphologyAnalysis {
             //重置段字符串
             tempStr = new StringBuilder();
         }
-        //将原输入的字符串进行输出，方便进行比对
-        System.out.println(s);
     }
 
     public static void main(String[] args) {
         try {
             codeStart();
+            //将答案写入文件
+            BufferedWriter bw;
+            bw = new BufferedWriter(new FileWriter("src\\output.text"));
+            bw.write(ans.toString());
+            bw.flush();
+            bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
